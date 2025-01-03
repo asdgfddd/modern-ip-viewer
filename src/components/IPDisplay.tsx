@@ -16,12 +16,14 @@ const IPDisplay = () => {
       return data.ip;
     },
     retry: 1,
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to fetch IP address. Please try again later.",
-        variant: "destructive",
-      });
+    meta: {
+      onError: () => {
+        toast({
+          title: "Error",
+          description: "Failed to fetch IP address. Please try again later.",
+          variant: "destructive",
+        });
+      },
     },
   });
 
