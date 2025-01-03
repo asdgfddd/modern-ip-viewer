@@ -35,18 +35,26 @@ const IPDisplay = () => {
   });
 
   const handleCopy = async (text: string, type: 'ip' | 'agent') => {
-    await navigator.clipboard.writeText(text);
-    if (type === 'ip') {
-      setCopiedIp(true);
-      setTimeout(() => setCopiedIp(false), 2000);
-    } else {
-      setCopiedAgent(true);
-      setTimeout(() => setCopiedAgent(false), 2000);
+    try {
+      await navigator.clipboard.writeText(text);
+      if (type === 'ip') {
+        setCopiedIp(true);
+        setTimeout(() => setCopiedIp(false), 2000);
+      } else {
+        setCopiedAgent(true);
+        setTimeout(() => setCopiedAgent(false), 2000);
+      }
+      toast({
+        title: "Copied!",
+        description: `${type === 'ip' ? 'IP address' : 'User agent'} copied to clipboard`,
+      });
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to copy to clipboard",
+        variant: "destructive",
+      });
     }
-    toast({
-      title: "Copied!",
-      description: `${type === 'ip' ? 'IP address' : 'User agent'} copied to clipboard`,
-    });
   };
 
   return (
@@ -71,7 +79,7 @@ const IPDisplay = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => handleCopy(data?.ip || '', 'ip')}
+                  onClick={() => data?.ip && handleCopy(data.ip, 'ip')}
                   className="hover:bg-white/10"
                   title="Copy IP address"
                 >
