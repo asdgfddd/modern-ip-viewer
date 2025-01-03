@@ -1,19 +1,22 @@
 import { useQuery } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
+import { Loader2, Monitor } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const IPDisplay = () => {
   const { toast } = useToast();
 
-  const { data: ip, isLoading, error } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ["ip"],
     queryFn: async () => {
-      const response = await fetch("https://api.ipify.org?format=json");
+      const response = await fetch("https://test.bezdar.eu/");
       if (!response.ok) {
         throw new Error("Failed to fetch IP address");
       }
-      const data = await response.json();
-      return data.ip;
+      const ip = await response.text();
+      return {
+        ip,
+        userAgent: navigator.userAgent,
+      };
     },
     retry: 1,
     meta: {
@@ -28,15 +31,33 @@ const IPDisplay = () => {
   });
 
   return (
-    <div className="glass-card rounded-xl p-8 w-full max-w-md mx-auto fade-in">
-      <h2 className="text-xl font-medium mb-4 text-foreground/80">Your Public IP Address</h2>
-      <div className="flex items-center justify-center h-20">
-        {isLoading ? (
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        ) : error ? (
-          <p className="text-destructive">Unable to fetch IP</p>
-        ) : (
-          <p className="text-3xl font-bold text-foreground break-all">{ip}</p>
+    <div className="glass-card rounded-xl p-8 w-full max-w-2xl mx-auto fade-in space-y-6">
+      <h2 className="text-2xl font-medium mb-4 text-foreground/80">Your Network Information</h2>
+      
+      <div className="space-y-6">
+        {/* IP Address Section */}
+        <div className="space-y-2">
+          <h3 className="text-lg text-foreground/60 flex items-center gap-2">
+            <Monitor className="w-5 h-5" />
+            Public IP Address
+          </h3>
+          <div className="flex items-center justify-center h-20 bg-background/50 rounded-lg">
+            {isLoading ? (
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            ) : error ? (
+              <p className="text-destructive">Unable to fetch IP</p>
+            ) : (
+              <p className="text-3xl font-bold text-foreground break-all">{data?.ip}</p>
+            )}
+          </div>
+        </div>
+
+        {/* User Agent Section */}
+        {data?.userAgent && (
+          <div className="p-4 bg-background/50 rounded-lg">
+            <h3 className="text-sm font-medium text-foreground/60 mb-2">User Agent</h3>
+            <p className="text-sm text-foreground/80 break-all">{data.userAgent}</p>
+          </div>
         )}
       </div>
     </div>
