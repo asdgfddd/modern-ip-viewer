@@ -4,7 +4,7 @@ const GitLabLink = () => {
       href="https://gitlab.com"
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed top-4 right-4 text-foreground/80 hover:text-foreground transition-colors"
+      className="fixed top-4 right-4 text-[#FC6D26] hover:text-[#E24329] transition-colors"
     >
       <svg
         className="w-8 h-8"

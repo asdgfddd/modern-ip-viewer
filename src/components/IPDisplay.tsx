@@ -6,7 +6,8 @@ import { Button } from "./ui/button";
 
 const IPDisplay = () => {
   const { toast } = useToast();
-  const [copied, setCopied] = useState(false);
+  const [copiedIp, setCopiedIp] = useState(false);
+  const [copiedAgent, setCopiedAgent] = useState(false);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["ip"],
@@ -33,16 +34,19 @@ const IPDisplay = () => {
     },
   });
 
-  const handleCopy = async () => {
-    if (data?.ip) {
-      await navigator.clipboard.writeText(data.ip);
-      setCopied(true);
-      toast({
-        title: "Copied!",
-        description: "IP address copied to clipboard",
-      });
-      setTimeout(() => setCopied(false), 2000);
+  const handleCopy = async (text: string, type: 'ip' | 'agent') => {
+    await navigator.clipboard.writeText(text);
+    if (type === 'ip') {
+      setCopiedIp(true);
+      setTimeout(() => setCopiedIp(false), 2000);
+    } else {
+      setCopiedAgent(true);
+      setTimeout(() => setCopiedAgent(false), 2000);
     }
+    toast({
+      title: "Copied!",
+      description: `${type === 'ip' ? 'IP address' : 'User agent'} copied to clipboard`,
+    });
   };
 
   return (
@@ -67,11 +71,11 @@ const IPDisplay = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={handleCopy}
+                  onClick={() => handleCopy(data?.ip || '', 'ip')}
                   className="hover:bg-white/10"
                   title="Copy IP address"
                 >
-                  {copied ? (
+                  {copiedIp ? (
                     <CheckCheck className="text-green-500" />
                   ) : (
                     <Copy className="text-foreground/60" />
@@ -86,7 +90,22 @@ const IPDisplay = () => {
         {data?.userAgent && (
           <div className="p-4 bg-background/50 rounded-lg">
             <h3 className="text-sm font-medium text-foreground/60 mb-2">User Agent</h3>
-            <p className="text-sm text-foreground/80 break-all">{data.userAgent}</p>
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm text-foreground/80 break-all">{data.userAgent}</p>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => handleCopy(data.userAgent, 'agent')}
+                className="hover:bg-white/10 shrink-0"
+                title="Copy user agent"
+              >
+                {copiedAgent ? (
+                  <CheckCheck className="text-green-500" />
+                ) : (
+                  <Copy className="text-foreground/60" />
+                )}
+              </Button>
+            </div>
           </div>
         )}
       </div>
